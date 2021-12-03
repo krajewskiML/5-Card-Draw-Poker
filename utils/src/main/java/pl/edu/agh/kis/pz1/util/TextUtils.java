@@ -36,6 +36,7 @@ public class TextUtils {
             throw new RuntimeException(e);
         }
     }
+
     public static String generateRandomHash() {
         return UUID.randomUUID().toString();
     }
@@ -43,7 +44,6 @@ public class TextUtils {
     public static String generateHash(String str) {
         return DigestUtils.sha512Hex(str);
     }
-
 
 
 }

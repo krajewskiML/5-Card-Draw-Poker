@@ -24,7 +24,7 @@ import java.util.Scanner;
 public class Main2 {
     public static void main(String[] args) throws IOException {
         Scanner myInput = new Scanner( System.in );
-        System.out.println("podaj liczbe graczy: ");
+        System.out.println("Podaj liczbe graczy: ");
         int howManyPlayers = myInput.nextInt();
         Table stol = new Table(howManyPlayers);
         stol.performRound();

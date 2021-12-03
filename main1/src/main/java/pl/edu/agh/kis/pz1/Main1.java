@@ -19,14 +19,17 @@ public class Main1 {
         PrintWriter out = new PrintWriter(client.getOutputStream(), true);
         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-        String fromServer, fromUser;
+        String fromServerType, fromServerMessage, fromUser;
         Scanner myInput = new Scanner( System.in );
 
-        while ((fromServer = in.readLine()) != null) {
-            System.out.println("Server: " + fromServer);
-            fromUser = myInput.nextLine();
-            if (fromUser != null) {
-                out.println(fromUser);
+        while ((fromServerType = in.readLine()) != null) {
+            fromServerMessage = in.readLine();
+            System.out.println("Server: " + fromServerMessage);
+            if(fromServerType.equals("1")){
+                fromUser = myInput.nextLine();
+                if (fromUser != null) {
+                    out.println(fromUser);
+                }
             }
         }
     }

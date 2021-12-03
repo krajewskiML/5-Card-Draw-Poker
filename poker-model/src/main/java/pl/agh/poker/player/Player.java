@@ -1,10 +1,12 @@
 package pl.agh.poker.player;
 
 import pl.agh.poker.elements.Card;
+import pl.agh.poker.elements.Deck;
 import pl.agh.poker.ranker.HandRanking;
 
 import pl.agh.poker.constants.Constants;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 
@@ -13,6 +15,9 @@ public class Player {
     private HandRanking handRanking;
     private String name;
     float balance;
+    float currentBalanceInPool;
+    boolean allIn;
+    boolean folded;
     boolean inGame;
 
     public Player() {
@@ -44,6 +49,38 @@ public class Player {
         return inGame;
     }
 
+    public boolean isAllIn() {
+        return allIn;
+    }
+
+    public boolean isFolded() {
+        return folded;
+    }
+
+    public boolean isInRound() {
+        return isInGame() && !isFolded();
+    }
+
+    public float getCurrentBalanceInPool() {
+        return currentBalanceInPool;
+    }
+
+    public void setCurrentBalanceInPool(float currentBalanceInPool) {
+        this.currentBalanceInPool = currentBalanceInPool;
+    }
+
+    public void addToBalance(float amount){
+        setBalance(balance + amount);
+    }
+
+    public void setAllIn(boolean allIn) {
+        this.allIn = allIn;
+    }
+
+    public void setFolded(boolean folded) {
+        this.folded = folded;
+    }
+
     public void setBalance(float balance) {
         this.balance = balance;
     }
@@ -60,9 +97,13 @@ public class Player {
         return name;
     }
 
-    public int bet(int amount) {
+    public float bet(float amount) {
         if (getBalance() >= amount) {
             setBalance(this.balance - amount);
+            setCurrentBalanceInPool(getCurrentBalanceInPool() + amount);
+            if (getBalance() == 0) {
+                setAllIn(true);
+            }
             return amount;
         } else {
             //throw exception
@@ -102,13 +143,20 @@ public class Player {
     }
 
     public void fold() {
-        setInGame(false);
+        setFolded(true);
     }
 
-    public void check() {
-    }
-
-    public void showCards(){
+    public void showCards() {
         System.out.println("twoje karty wersja podstawowa");
+    }
+
+    public void swapCards(Deck deck) throws IOException {
+    }
+
+    public float placeBet(float max_bet) throws IOException {
+        return 0;
+    }
+
+    public void sendMessageWithoutResponse(String a) {
     }
 }
