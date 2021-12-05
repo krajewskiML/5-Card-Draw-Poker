@@ -159,4 +159,8 @@ public class Player {
 
     public void sendMessageWithoutResponse(String a) {
     }
+
+    public String sendMessageGetResponse(String message) throws IOException {
+        return "";
+    }
 }

@@ -8,33 +8,34 @@ public class Card {
     private int rank;
     private int suite;
 
-    private final Map<Integer, String> rankToString = new HashMap<Integer, String>() {{
-        put(0, "Two");
-        put(1, "Three");
-        put(2, "Four");
-        put(3, "Five");
-        put(4, "Six");
-        put(5, "Seven");
-        put(6, "Eight");
-        put(7, "Nine");
-        put(8, "Ten");
-        put(9, "Jack");
-        put(10, "Queen");
-        put(11, "King");
-        put(12, "Ace");
-    }};
+    private final Map<Integer, String> rankToString = new HashMap<Integer, String>();
 
-    private final Map<Integer, String> suiteToString = new HashMap<Integer, String>() {{
-        put(0, "Hearts");
-        put(1, "Diamonds");
-        put(2, "Clovers");
-        put(3, "Pikes");
-    }};
+
+    private final Map<Integer, String> suiteToString = new HashMap<Integer, String>();
+
 
     public Card(int rank, int suite) {
         //initializes rank and suite values
         this.setRank(rank);
         this.setSuite(suite);
+        rankToString.put(0, "Two");
+        rankToString.put(1, "Three");
+        rankToString.put(2, "Four");
+        rankToString.put(3, "Five");
+        rankToString.put(4, "Six");
+        rankToString.put(5, "Seven");
+        rankToString.put(6, "Eight");
+        rankToString.put(7, "Nine");
+        rankToString.put(8, "Ten");
+        rankToString.put(9, "Jack");
+        rankToString.put(10, "Queen");
+        rankToString.put(11, "King");
+        rankToString.put(12, "Ace");
+
+        suiteToString.put(0, "Hearts");
+        suiteToString.put(1, "Diamonds");
+        suiteToString.put(2, "Clovers");
+        suiteToString.put(3, "Pikes");
     }
 
 

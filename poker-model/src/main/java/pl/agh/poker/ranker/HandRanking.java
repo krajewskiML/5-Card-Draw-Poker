@@ -2,7 +2,6 @@ package pl.agh.poker.ranker;
 
 import pl.agh.poker.elements.Card;
 import pl.agh.poker.elements.CardComparator;
-import pl.agh.poker.player.Player;
 
 import pl.agh.poker.constants.Constants;
 
@@ -117,8 +116,8 @@ public class HandRanking {
             }
         }
         if (maxPairValue > -1) {
-            cards.remove(maxPairValue);
-            cards.remove(maxPairValue);
+            ranks.remove(Integer.valueOf(maxPairValue));
+            ranks.remove(Integer.valueOf(maxPairValue));
             return Arrays.asList(maxPairValue,
                     ranks.get(0),
                     ranks.get(1),

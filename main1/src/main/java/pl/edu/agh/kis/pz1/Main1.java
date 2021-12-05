@@ -1,7 +1,5 @@
 package pl.edu.agh.kis.pz1;
 
-import pl.edu.agh.kis.pz1.util.TextUtils;
-
 import pl.agh.poker.constants.Constants;
 
 import java.io.*;
@@ -15,22 +13,36 @@ import java.util.Scanner;
  */
 public class Main1 {
     public static void main( String[] args ) throws IOException {
-        Socket client = new Socket("localhost", Constants.PORT);
-        PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        Socket client = null;
+        try{
+            client = new Socket("localhost", Constants.PORT);
+            PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-        String fromServerType, fromServerMessage, fromUser;
-        Scanner myInput = new Scanner( System.in );
+            String fromServerType;
+            String fromServerMessage;
+            String fromUser;
+            Scanner myInput = new Scanner(System.in);
 
-        while ((fromServerType = in.readLine()) != null) {
-            fromServerMessage = in.readLine();
-            System.out.println("Server: " + fromServerMessage);
-            if(fromServerType.equals("1")){
-                fromUser = myInput.nextLine();
-                if (fromUser != null) {
-                    out.println(fromUser);
+            while ((fromServerType = in.readLine()) != null) {
+                fromServerMessage = in.readLine();
+                System.out.println("Server: " + fromServerMessage);
+                if (fromServerMessage.equals("Thanks for game!")) {
+                    break;
+                }
+                if (fromServerType.equals("1")) {
+                    fromUser = myInput.nextLine();
+                    if (fromUser != null) {
+                        out.println(fromUser.replaceAll("\\s+", ""));
+                    }
                 }
             }
+        } catch (Exception e){
+            e.printStackTrace();
         }
+        finally {
+            client.close();
+        }
+
     }
 }

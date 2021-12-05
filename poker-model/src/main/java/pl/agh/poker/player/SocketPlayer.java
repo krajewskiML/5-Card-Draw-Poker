@@ -1,6 +1,5 @@
 package pl.agh.poker.player;
 
-import jdk.nashorn.internal.runtime.Scope;
 import pl.agh.poker.elements.Card;
 import pl.agh.poker.elements.Deck;
 
@@ -10,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 
 public class SocketPlayer extends Player {
 
@@ -20,31 +18,33 @@ public class SocketPlayer extends Player {
 
     public SocketPlayer(Socket client) throws IOException {
         super();
+        socket = client;
         out = new PrintWriter(client.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
         setName(getNick());
-        System.out.println("nowy gracz na serwerze: " + getName());
+        System.out.println("New player joined: " + getName());
     }
 
     private String getNick() throws IOException {
-        return sendMessageGetResponse("Wpisz swoj nick: ");
+        return sendMessageGetResponse("Type in your nick: ");
     }
 
     public void showCards() {
         StringBuilder outString = new StringBuilder();
-        outString.append("Twoje karty to: ");
+        int cardIdx = 0;
+        outString.append("Your cards are: ");
         for (Card card : getCards()) {
-            outString.append(card.toString()).append(", ");
+            outString.append(String.valueOf(cardIdx)).append(" ").append(card.toString()).append(", ");
         }
         sendMessageWithoutResponse(outString.toString());
     }
 
     public void swapCards(Deck deck) throws IOException {
-        int numberOfCardsToSwap = Integer.parseInt(sendMessageGetResponse("Ile kart chcesz wymienic: "));
+        int numberOfCardsToSwap = Integer.parseInt(sendMessageGetResponse("How many cards you want to replace: "));
         ArrayList<Integer> cardsToReturn = new ArrayList<>();
         for (int idx = 0; idx < numberOfCardsToSwap; ++idx) {
             cardsToReturn.add(
-                    Integer.parseInt(sendMessageGetResponse("Wpisz indeks karty którą chcesz wymienic: "))
+                    Integer.parseInt(sendMessageGetResponse("Type in card index that you want to replace: "))
             );
         }
         returnCards(cardsToReturn);
@@ -58,13 +58,13 @@ public class SocketPlayer extends Player {
         if(currentBet > currentBalanceInPool + balance){
             // if less money than max bet then fold or all in
             possibleChoices.add("fold");
-            possibleChoices.add("all in");
+            possibleChoices.add("allin");
         }else{
             if (currentBet == 0) {
                 possibleChoices.add("check");
             }
             possibleChoices.add("fold");
-            possibleChoices.add("all in");
+            possibleChoices.add("allin");
             if (currentBalanceInPool + balance >= currentBet) {
                 possibleChoices.add("call");
                 if (currentBalanceInPool + balance > currentBet) {
@@ -83,9 +83,10 @@ public class SocketPlayer extends Player {
         switch (answer) {
             case "fold":
                 fold();
+                break;
             case "check":
                 break;
-            case "all in":
+            case "allin":
                 amount = balance;
                 setAllIn(true);
                 break;
@@ -103,7 +104,7 @@ public class SocketPlayer extends Player {
         return bet(amount);
     }
 
-    private String sendMessageGetResponse(String message) throws IOException {
+    public String sendMessageGetResponse(String message) throws IOException {
         out.println(1);
         out.println(message);
         return in.readLine();
