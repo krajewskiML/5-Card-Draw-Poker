@@ -5,6 +5,7 @@ import pl.agh.poker.constants.Constants;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.*;
 
 
 /**
@@ -12,17 +13,23 @@ import java.util.Scanner;
  * @author Paweł Skrzyński
  */
 public class Main1 {
-    public static void main( String[] args ) throws IOException {
-        Socket client = null;
-        try{
-            client = new Socket("localhost", Constants.PORT);
+    public static void main( String[] args ) {
+        Scanner myInput = new Scanner(System.in);
+        Logger clientLogger = Logger.getLogger("clientLogger");
+        clientLogger.setLevel(Level.ALL);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.ALL);
+        clientLogger.addHandler(handler);
+
+        // implement s4jlf logger
+
+        try (Socket client = new Socket("localhost", Constants.PORT)) {
             PrintWriter out = new PrintWriter(client.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
             String fromServerType;
             String fromServerMessage;
             String fromUser;
-            Scanner myInput = new Scanner(System.in);
 
             while ((fromServerType = in.readLine()) != null) {
                 fromServerMessage = in.readLine();
@@ -37,12 +44,8 @@ public class Main1 {
                     }
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        finally {
-            client.close();
-        }
-
     }
 }

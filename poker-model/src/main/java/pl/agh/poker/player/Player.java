@@ -1,13 +1,10 @@
 package pl.agh.poker.player;
 
 import pl.agh.poker.elements.Card;
-import pl.agh.poker.elements.Deck;
 import pl.agh.poker.ranker.HandRanking;
 
 import pl.agh.poker.constants.Constants;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.*;
 
 public class Player {
@@ -16,19 +13,13 @@ public class Player {
     private String name;
     float balance;
     float currentBalanceInPool;
-    boolean allIn;
+    boolean isAllIn;
     boolean folded;
     boolean inGame;
+    boolean hasParticipatedInRound;
 
     public Player() {
         cards = new ArrayList<>();
-        setBalance(Constants.STARTING_BALANCE);
-        setInGame(true);
-    }
-
-    public Player(String name) {
-        cards = new ArrayList<>();
-        setName(name);
         setBalance(Constants.STARTING_BALANCE);
         setInGame(true);
     }
@@ -50,11 +41,19 @@ public class Player {
     }
 
     public boolean isAllIn() {
-        return allIn;
+        return isAllIn;
     }
 
     public boolean isFolded() {
         return folded;
+    }
+
+    public boolean isHasParticipatedInRound() {
+        return hasParticipatedInRound;
+    }
+
+    public void setHasParticipatedInRound(boolean hasParticipatedInRound) {
+        this.hasParticipatedInRound = hasParticipatedInRound;
     }
 
     public boolean isInRound() {
@@ -74,7 +73,7 @@ public class Player {
     }
 
     public void setAllIn(boolean allIn) {
-        this.allIn = allIn;
+        this.isAllIn = allIn;
     }
 
     public void setFolded(boolean folded) {
@@ -144,23 +143,5 @@ public class Player {
 
     public void fold() {
         setFolded(true);
-    }
-
-    public void showCards() {
-        System.out.println("twoje karty wersja podstawowa");
-    }
-
-    public void swapCards(Deck deck) throws IOException {
-    }
-
-    public float placeBet(float max_bet) throws IOException {
-        return 0;
-    }
-
-    public void sendMessageWithoutResponse(String a) {
-    }
-
-    public String sendMessageGetResponse(String message) throws IOException {
-        return "";
     }
 }

@@ -14,7 +14,7 @@ import java.net.Socket;
 import java.util.*;
 
 public class Table {
-    List<Player> players;
+    List<SocketPlayer> players;
     float currentPool;
     Deck deck;
     ServerSocket server;
@@ -39,14 +39,6 @@ public class Table {
         this.deck = deck;
     }
 
-    private void setPlayers(List<Player> players) {
-        this.players = players;
-    }
-
-    private List<Player> getPlayers() {
-        return players;
-    }
-
     private float getCurrentPool() {
         return currentPool;
     }
@@ -68,7 +60,7 @@ public class Table {
     }
 
     private void ante() {
-        for (Player player : players) {
+        for (SocketPlayer player : players) {
             if (player.getBalance() < Constants.ANTE) {
                 player.setInGame(false);
             } else {
@@ -86,27 +78,38 @@ public class Table {
         }
     }
 
-    private void rateHands() {
-        for (Player player : players) {
+    private void rateHands(){
+        for (SocketPlayer player : players) {
             player.setHandRanking(new HandRanking(player.getCards()));
         }
     }
 
-    private List<Player> getBestPlayers() {
+    private List<SocketPlayer> getActivePlayers(){
+        List<SocketPlayer> validPlayers = new ArrayList<>();
+        for(SocketPlayer player: players){
+            if(player.isInGame() && !player.isFolded()){
+                validPlayers.add(player);
+            }
+        }
+        return validPlayers;
+    }
+
+    private List<SocketPlayer> getBestPlayers(){
         rateHands();
         PlayerComparator playerComparator = new PlayerComparator();
-        players.sort(playerComparator);
-        Collections.reverse(players);
-        List<Player> bestPlayers = new ArrayList<>();
-        for (int idx = 0; idx < players.size(); ++idx) {
-            if (players.get(idx).isInGame() && !players.get(idx).isFolded()) {
-                if (bestPlayers.isEmpty()) {
-                    bestPlayers.add(players.get(idx));
+        List<SocketPlayer> validPlayers = getActivePlayers();
+        List<SocketPlayer> bestPlayers = new ArrayList<>();
+
+        for(SocketPlayer player: validPlayers) {
+            if (bestPlayers.isEmpty()) {
+                bestPlayers.add(player);
+            } else {
+                if (Objects.equals(bestPlayers.get(0).getHandRanking(), player.getHandRanking())) {
+                    bestPlayers.add(player);
                 } else {
-                    if (Objects.equals(bestPlayers.get(0).getHandRanking(), players.get(idx).getHandRanking())) {
-                        bestPlayers.add(players.get(idx));
-                    } else {
-                        break;
+                    if (playerComparator.compare(bestPlayers.get(0), player) > 0) {
+                        bestPlayers.clear();
+                        bestPlayers.add(player);
                     }
                 }
             }
@@ -114,86 +117,69 @@ public class Table {
         return bestPlayers;
     }
 
+    private void informOtherPlayersAboutBet(float bet, SocketPlayer player){
+        String nameOfPlayer = player.getName();
+        for(SocketPlayer player1: players){
+            if(!Objects.equals(player1.getName(), nameOfPlayer)){
+                player1.sendMessageWithoutResponse(nameOfPlayer + " has bet" + bet);
+            }
+        }
+    }
+
     private void performBettingPhase() throws IOException {
-        float max_bet = 0, allBets = 0, currentBet;
-        Player currentPlayer;
+        float max_bet = 0;
+        float allBets = 0;
+        float currentBet;
+        List<SocketPlayer> consideredPlayers;
 
-        for (Player player : players) {
+        boolean allPlayersDone = false;
+        while(!allPlayersDone){
+            //gets players that are in game and has not folded
+            consideredPlayers = getActivePlayers();
+            for(SocketPlayer player: consideredPlayers){
+                //if player is not all in and has less in pool then others then he needs to do smth
+                if((!player.isAllIn() && player.getCurrentBalanceInPool() <  max_bet) || !player.isHasParticipatedInRound() ){
+                    currentBet = player.placeBet(max_bet);
+                    allBets += currentBet;
+                    max_bet = Math.max(max_bet, currentBet);
+                    informOtherPlayersAboutBet(currentBet, player);
+                }
+            }
+            consideredPlayers = getActivePlayers();
+            allPlayersDone = true;
+            for(SocketPlayer player: consideredPlayers){
+                //if player is not all in and has less in pool then others then he needs to do smth
+                if(!player.isAllIn() && player.getCurrentBalanceInPool() <  max_bet) {
+                    allPlayersDone = false;
+                    break;
+                }
+            }
+        }
+
+
+        for (SocketPlayer player : players) {
             player.setCurrentBalanceInPool(0);
-        }
-
-        // perform first round betting
-        for (int playerIdx = 0; playerIdx < players.size(); ++playerIdx) {
-            currentPlayer = players.get(playerIdx);
-            if (currentPlayer.isAllIn() || currentPlayer.isFolded() || !currentPlayer.isInGame()) {
-                continue;
-            }
-            currentBet = currentPlayer.placeBet(max_bet);
-            if (max_bet < currentBet) {
-                max_bet = currentBet;
-            }
-            for (int otherPlayers = 0; otherPlayers < players.size(); ++otherPlayers) {
-                if (otherPlayers != playerIdx) {
-                    players.get(otherPlayers).sendMessageWithoutResponse(currentPlayer.getName() + " current bet is: " + String.valueOf(currentPlayer.getCurrentBalanceInPool()));
-                }
-            }
-            allBets += currentBet;
-        }
-        boolean allEven = false;
-        for (int playerIdx = 0; !allEven; playerIdx = (playerIdx + 1) % players.size()) {
-            // checks if this player should perform any action
-            currentPlayer = players.get(playerIdx);
-            if (currentPlayer.isAllIn() || currentPlayer.isFolded() || !currentPlayer.isInGame() || currentPlayer.getCurrentBalanceInPool() == max_bet) {
-
-            } else {
-                // if this player has to do smth then ask him to place a bet
-                currentBet = currentPlayer.placeBet(max_bet);
-                if (max_bet < currentPlayer.getCurrentBalanceInPool()) {
-                    max_bet = currentPlayer.getCurrentBalanceInPool();
-                }
-                //inform other players about his movement
-                for (int otherPlayers = 0; otherPlayers < players.size(); ++otherPlayers) {
-                    if (otherPlayers != playerIdx) {
-                        players.get(otherPlayers).sendMessageWithoutResponse(String.valueOf(currentPlayer.getName()) + " current bet is: " + String.valueOf(String.valueOf(currentPlayer.getCurrentBalanceInPool())));
-                    }
-                }
-                allBets += currentBet;
-            }
-            //check if any player should perform any more actions
-            allEven = true;
-            for (int playerIdxInside = 0; playerIdxInside < players.size(); ++playerIdxInside) {
-                currentPlayer = players.get(playerIdxInside);
-                if (currentPlayer.isAllIn() || currentPlayer.isFolded() || !currentPlayer.isInGame() || currentPlayer.getCurrentBalanceInPool() == max_bet) {
-                    continue;
-                } else {
-                    allEven = false;
-                }
-            }
-        }
-
-
-        for (Player player : players) {
-            player.setCurrentBalanceInPool(0);
+            player.setHasParticipatedInRound(false);
         }
         setCurrentPool(getCurrentPool() + allBets);
     }
 
     private void swapCards() throws IOException {
-        for (Player player : players) {
+        for (SocketPlayer player : players) {
             player.showCards();
             player.swapCards(deck);
         }
     }
 
     private void distributePool() {
-        List<Player> bestPlayers = getBestPlayers();
+        List<SocketPlayer> bestPlayers = getBestPlayers();
         int splitCurrentPoolBy = bestPlayers.size();
         float amountWon = currentPool / splitCurrentPoolBy;
-        for (Player player : bestPlayers) {
+        for (SocketPlayer player : bestPlayers) {
             player.addToBalance(amountWon);
         }
         setCurrentPool(0);
-        for (Player player : players) {
+        for (SocketPlayer player : players) {
             player.sendMessageWithoutResponse("Your current balance is: " + String.valueOf(player.getBalance()));
         }
     }
@@ -206,7 +192,7 @@ public class Table {
 
     private boolean checkIfGameIsDone() {
         int playersHavingMoney = 0;
-        for (Player player : players) {
+        for (SocketPlayer player : players) {
             if (player.getBalance() > 0) {
                 ++playersHavingMoney;
             }
@@ -215,13 +201,12 @@ public class Table {
     }
 
     private void refreshPlayersState(){
-        for(Player player: players){
+        for(SocketPlayer player: players){
             player.setFolded(false);
             player.setAllIn(false);
             player.setCurrentBalanceInPool(0);
         }
     }
-
 
     public void performRound() throws IOException {
         refreshPlayersState();
@@ -243,7 +228,7 @@ public class Table {
     private boolean checkIfPlayersWantToContinue() throws IOException {
         int howManyWantToStop = 0;
         String answer;
-        for (Player player : players) {
+        for (SocketPlayer player : players) {
             answer = player.sendMessageGetResponse("Do you still want to to play? (yes, no): ");
             if (Objects.equals(answer, "no")) {
                 ++howManyWantToStop;
@@ -256,7 +241,6 @@ public class Table {
         sendMessageToPlayers(getIndicesOfPlayers(), "Thanks for game!");
         server.close();
     }
-
 
     public void performGame() throws IOException {
         while (!checkIfGameIsDone()) {

@@ -35,47 +35,42 @@ public class HandRanking {
     }
 
     private void calculateHand(List<Card> cards) {
-        if (checkStraightFlush(cards) != null) {
+        if (!checkStraightFlush(cards).isEmpty()) {
             setSignificantValues(checkStraightFlush(cards));
-            setStrengthOfHand(9);
-            return;
-        }
-        if (check4OfKind(cards) != null) {
-            setSignificantValues(check4OfKind(cards));
             setStrengthOfHand(8);
             return;
         }
-        if (checkFullHouse(cards) != null) {
-            setSignificantValues(checkFullHouse(cards));
+        if (!check4OfKind(cards).isEmpty()) {
+            setSignificantValues(check4OfKind(cards));
             setStrengthOfHand(7);
             return;
         }
-        if (checkFlush(cards) != null) {
-            setSignificantValues(checkFlush(cards));
+        if (!checkFullHouse(cards).isEmpty()) {
+            setSignificantValues(checkFullHouse(cards));
             setStrengthOfHand(6);
             return;
         }
-        if (checkStraight(cards) != null) {
-            setSignificantValues(checkStraight(cards));
+        if (!checkFlush(cards).isEmpty()) {
+            setSignificantValues(checkFlush(cards));
             setStrengthOfHand(5);
             return;
         }
-        if (checkStraight(cards) != null) {
+        if (!checkStraight(cards).isEmpty()) {
             setSignificantValues(checkStraight(cards));
             setStrengthOfHand(4);
             return;
         }
-        if (check3OfKind(cards) != null) {
+        if (!check3OfKind(cards).isEmpty()) {
             setSignificantValues(check3OfKind(cards));
             setStrengthOfHand(3);
             return;
         }
-        if (checkTwoPairs(cards) != null) {
+        if (!checkTwoPairs(cards).isEmpty()) {
             setSignificantValues(checkTwoPairs(cards));
             setStrengthOfHand(2);
             return;
         }
-        if (checkPair(cards) != null) {
+        if (!checkPair(cards).isEmpty()) {
             setSignificantValues(checkPair(cards));
             setStrengthOfHand(1);
             return;
@@ -100,32 +95,20 @@ public class HandRanking {
         return values;
     }
 
-
     private List<Integer> checkHighCard(List<Card> cards) {
         return getRanksOfCards(cards);
     }
 
     private List<Integer> checkPair(List<Card> cards) {
         List<Integer> ranks = getRanksOfCards(cards);
-        int maxPairValue = -1;
         for (int idx = 0; idx < Constants.CARDS_IN_HAND; ++idx) {
             if (Collections.frequency(ranks, ranks.get(idx)) == 2) {
-                if (maxPairValue < ranks.get(idx)) {
-                    maxPairValue = ranks.get(idx);
-                }
+                ranks.remove(ranks.get(idx));
+                ranks.remove(ranks.get(idx));
+                return Arrays.asList(ranks.get(idx), ranks.get(0), ranks.get(1), ranks.get(2));
             }
         }
-        if (maxPairValue > -1) {
-            ranks.remove(Integer.valueOf(maxPairValue));
-            ranks.remove(Integer.valueOf(maxPairValue));
-            return Arrays.asList(maxPairValue,
-                    ranks.get(0),
-                    ranks.get(1),
-                    ranks.get(2)
-            );
-        } else {
-            return null;
-        }
+        return Collections.emptyList();
     }
 
     private List<Integer> checkTwoPairs(List<Card> cards) {
@@ -153,7 +136,7 @@ public class HandRanking {
                     ranks.get(0)
             );
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -176,48 +159,30 @@ public class HandRanking {
                     ranks.get(1)
             );
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
 
     private List<Integer> checkStraight(List<Card> cards) {
         List<Integer> ranks = getRanksOfCards(cards);
-        boolean isStraight = true;
-        //standard straight
-        for (int idx = 1; idx < ranks.size(); ++idx) {
-            if (ranks.get(idx) != ranks.get(idx - 1) - 1) {
-                isStraight = false;
-                break;
+        //check for straight starting with ace
+        if (ranks.get(0) == 12 && ranks.get(1) == 3 && ranks.get(2) == 2 && ranks.get(3) == 1 && ranks.get(4) == 0) {
+            return Collections.singletonList(3);
+        }
+        //check for normal straight
+        for (int idx = 0; idx < ranks.size() - 1; ++idx) {
+            if (ranks.get(idx) != ranks.get(idx + 1) + 1) {
+                return Collections.emptyList();
             }
         }
-        if (isStraight) {
-            return Arrays.asList(ranks.get(4));
-        } else {
-            //check for straight starting from an ace
-            if (ranks.get(0) == 12 && ranks.get(1) == 3) {
-                isStraight = true;
-                for (int idx = 2; idx < ranks.size(); ++idx) {
-                    if (ranks.get(idx) != ranks.get(idx - 1) - 1) {
-                        isStraight = false;
-                        break;
-                    }
-                }
-                if (isStraight) {
-                    return Arrays.asList(-1);
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
-        }
+        return Collections.singletonList(ranks.get(0));
     }
 
     private List<Integer> checkFlush(List<Card> cards) {
         List<Integer> suits = getSuitesOfCards(cards);
         for (int idx = 1; idx < suits.size(); ++idx) {
             if (!Objects.equals(suits.get(idx), suits.get(0))) {
-                return null;
+                return Collections.emptyList();
             }
         }
         return getRanksOfCards(cards);
@@ -225,8 +190,8 @@ public class HandRanking {
 
     private List<Integer> checkFullHouse(List<Card> cards) {
         List<Integer> tripleValues = check3OfKind(cards);
-        if (tripleValues == null) {
-            return null;
+        if (tripleValues.isEmpty()) {
+            return Collections.emptyList();
         }
         List<Integer> ranks = getRanksOfCards(cards);
         ranks.remove(tripleValues.get(0));
@@ -235,10 +200,9 @@ public class HandRanking {
         if (Objects.equals(ranks.get(0), ranks.get(1))) {
             return Arrays.asList(tripleValues.get(0), ranks.get(0));
         } else {
-            return null;
+            return Collections.emptyList();
         }
     }
-
 
     private List<Integer> check4OfKind(List<Card> cards) {
         List<Integer> ranks = getRanksOfCards(cards);
@@ -261,16 +225,16 @@ public class HandRanking {
                 return Arrays.asList(quadValue, ranks.get(0));
             }
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private List<Integer> checkStraightFlush(List<Card> cards) {
         List<Integer> straight = checkStraight(cards);
         List<Integer> flush = checkFlush(cards);
-        if (straight != null && flush != null) {
+        if (!straight.isEmpty() && !flush.isEmpty()) {
             return straight;
         }
-        return null;
+        return Collections.emptyList();
     }
 
 }

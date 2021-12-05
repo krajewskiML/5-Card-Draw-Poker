@@ -12,6 +12,12 @@ import java.util.ArrayList;
 
 public class SocketPlayer extends Player {
 
+    static final String ALLIN = "allin";
+    static final String FOLD = "fold";
+    static final String CHECK = "check";
+    static final String CALL = "call";
+    static final String RAISE = "raise";
+
     PrintWriter out;
     BufferedReader in;
     Socket socket;
@@ -34,7 +40,8 @@ public class SocketPlayer extends Player {
         int cardIdx = 0;
         outString.append("Your cards are: ");
         for (Card card : getCards()) {
-            outString.append(String.valueOf(cardIdx)).append(" ").append(card.toString()).append(", ");
+            outString.append(cardIdx).append(" ").append(card.toString()).append(", ");
+            ++cardIdx;
         }
         sendMessageWithoutResponse(outString.toString());
     }
@@ -57,18 +64,18 @@ public class SocketPlayer extends Player {
 
         if(currentBet > currentBalanceInPool + balance){
             // if less money than max bet then fold or all in
-            possibleChoices.add("fold");
-            possibleChoices.add("allin");
+            possibleChoices.add(FOLD);
+            possibleChoices.add(ALLIN);
         }else{
             if (currentBet == 0) {
-                possibleChoices.add("check");
+                possibleChoices.add(CHECK);
             }
-            possibleChoices.add("fold");
-            possibleChoices.add("allin");
+            possibleChoices.add(FOLD);
+            possibleChoices.add(ALLIN);
             if (currentBalanceInPool + balance >= currentBet) {
-                possibleChoices.add("call");
+                possibleChoices.add(CALL);
                 if (currentBalanceInPool + balance > currentBet) {
-                    possibleChoices.add("raise");
+                    possibleChoices.add(RAISE);
                 }
             }
         }
@@ -81,19 +88,19 @@ public class SocketPlayer extends Player {
         String answer = sendMessageGetResponse(bettingMessage.toString());
         float amount = 0;
         switch (answer) {
-            case "fold":
+            case FOLD:
                 fold();
                 break;
-            case "check":
+            case CHECK:
                 break;
-            case "allin":
+            case ALLIN:
                 amount = balance;
                 setAllIn(true);
                 break;
-            case "call":
+            case CALL:
                 amount = currentBet - currentBalanceInPool;
                 break;
-            case "raise":
+            case RAISE:
                 do {
                     amount = Float.parseFloat(sendMessageGetResponse("Type in how much you want to add to bet, min(" + String.valueOf(currentBet - currentBalanceInPool) + "): "));
                 } while (amount <= currentBet - currentBalanceInPool);
@@ -101,6 +108,7 @@ public class SocketPlayer extends Player {
             default:
                 throw new IllegalStateException("Unexpected value: " + answer);
         }
+        setHasParticipatedInRound(true);
         return bet(amount);
     }
 
