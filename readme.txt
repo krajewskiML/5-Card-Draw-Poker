@@ -1,10 +1,28 @@
-1. Przykład wygenerowany na bazie archetypu (moduł main):
-   com.github.charlie-cityu.archetypes:docs-city-archetype-quickstart
-   (A variation on the maven-archetype-quickstart with source set to 1.8,
-    build to executable jar with dependencies and junit 4.12. File names have been changed
-    to Main.java and MainTest.java. Directory structure remains consistent with the Maven
-    standard.)
+Przebieg gry:
+1. Ante
+2. Rozdanie kart
+3. Każdy gracz może wymienić określoną ilość kart
+4. Pierwsza tura licytacji
+5. Każdy gracz może wymienić określoną ilość kart
+6. Druga tura licytacji
+7. Wyłonienie zwycięzcy/zwycięzców
+8. Rozdzielenie puli na zwycięzców
+9. Spytanie graczy czy chcą kontynuować rozgrywkę (jeżeli wszyscy gracze chcą przerwać grę to ją przerywamy)
 
-2. Przyład buduje pliki jar z zależnościami - oba moduly posiadaja dodaną zależność od maaven-assembly-plugin (z lab. 3 i lab. 4):
+Zasady gry którymi się się kierowałem podczas pisania można znaleźć w poniższym filmiku:
+https://www.youtube.com/watch?v=bOyZbYjUcZg&t=159s
 
-3. Przyład jest modyfikacja przykladu multi-module - posiada 3 moduły z czego dwa z nich mają klasy z metoda main.
+Jak uruchomić serwer?
+Aby uruchomić serwer najpierw należy na głównym pom.xml uruchomić "mvn clean package". Następnie
+należy uruchomić skompilowanego jara main2 w terminalu. Serwer spyta nas ilu graczy chcemy hostować. Następnie
+serwer nasłuchuje na połączenia graczy. Po połączeniu zadeklarowanej liczby graczy serwer przeprowadza nas przez
+rozgrywke.
+
+Jak dołączyć do rozgrywki?
+Aby dołączyć do rozgrywki trzeba również zbudować głownego pom.xml podobnie jak w instrukcji serwera. Następnie
+należy uruchomić skompilowanego jara main1 w terminalu. Serwer poprosi nas o wpisanie nicku a potem
+przeprowadzi nas przez rozgrywke.
+
+Gdzie można znaleźć kod?
+Link do githuba:
+

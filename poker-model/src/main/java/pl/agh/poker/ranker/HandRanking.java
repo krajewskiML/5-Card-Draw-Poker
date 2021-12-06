@@ -7,10 +7,17 @@ import pl.agh.poker.constants.Constants;
 
 import java.util.*;
 
+/**
+ * Class that rates player hand
+ */
 public class HandRanking {
     List<Integer> significantValues;
     int strengthOfHand;
 
+    /**
+     * Rates player hand by checking all possible combinations top to bottom
+     * @param cards cards owned by player
+     */
     public HandRanking(List<Card> cards) {
         CardComparator cardComparator = new CardComparator();
         cards.sort(cardComparator);
@@ -26,10 +33,18 @@ public class HandRanking {
         this.strengthOfHand = strengthOfHand;
     }
 
+    /**
+     *Returns strength of hand ranking descriibed by integer
+     * @return integer indicating strength of hand (the bigger the number the better hand ranking)
+     */
     public int getStrengthOfHand() {
         return strengthOfHand;
     }
 
+    /**
+     * Returns numbers characterizing giiven hand rankng
+     * @return List of significant values
+     */
     public List<Integer> getSignificantValues() {
         return significantValues;
     }
@@ -248,6 +263,10 @@ public class HandRanking {
         return Collections.emptyList();
     }
 
+    /**
+     * String representation of hadn ranking
+     * @return string representation of hand ranking
+     */
     public String toString() {
         switch (getStrengthOfHand()){
             case 0:

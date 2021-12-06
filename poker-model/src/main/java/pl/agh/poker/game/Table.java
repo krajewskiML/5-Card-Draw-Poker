@@ -282,10 +282,10 @@ public class Table {
 
     /**
      * Performs one whole game until one player is winning or all players don't want to play
-     * @throws IOException
-     * @throws WrongCardsIndicesException
-     * @throws NotEnoughCardsInDeckException
-     * @throws TooMuchCardsTooDiscard
+     * @throws IOException when there is no input from user
+     * @throws WrongCardsIndicesException when wrong indices of cards are being discarded
+     * @throws NotEnoughCardsInDeckException when there are no cards to draw from
+     * @throws TooMuchCardsTooDiscard when player wants to discard too much card
      */
     public void performGame() throws IOException, WrongCardsIndicesException, NotEnoughCardsInDeckException, TooMuchCardsTooDiscard {
         while (!checkIfGameIsDone()) {
