@@ -1,7 +1,11 @@
 package pl.agh.poker.player;
 
+import pl.agh.poker.constants.Constants;
 import pl.agh.poker.elements.Card;
 import pl.agh.poker.elements.Deck;
+import pl.agh.poker.exceptions.NotEnoughCardsInDeckException;
+import pl.agh.poker.exceptions.TooMuchCardsTooDiscard;
+import pl.agh.poker.exceptions.WrongCardsIndicesException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,13 +50,18 @@ public class SocketPlayer extends Player {
         sendMessageWithoutResponse(outString.toString());
     }
 
-    public void swapCards(Deck deck) throws IOException {
+    public void swapCards(Deck deck) throws IOException, WrongCardsIndicesException, NotEnoughCardsInDeckException, TooMuchCardsTooDiscard {
         int numberOfCardsToSwap = Integer.parseInt(sendMessageGetResponse("How many cards you want to replace: "));
+        if(numberOfCardsToSwap > Constants.CARDS_IN_HAND){
+            throw new TooMuchCardsTooDiscard(numberOfCardsToSwap);
+        }
         ArrayList<Integer> cardsToReturn = new ArrayList<>();
         for (int idx = 0; idx < numberOfCardsToSwap; ++idx) {
-            cardsToReturn.add(
-                    Integer.parseInt(sendMessageGetResponse("Type in card index that you want to replace: "))
-            );
+            int indexOfCard = Integer.parseInt(sendMessageGetResponse("Type in card index that you want to replace: "));
+            if (indexOfCard < 0 || indexOfCard >= Constants.CARDS_IN_HAND){
+                throw new WrongCardsIndicesException(indexOfCard);
+            }
+            cardsToReturn.add(indexOfCard);
         }
         returnCards(cardsToReturn);
         fetchCards(deck.dealCards(numberOfCardsToSwap));
@@ -102,7 +111,7 @@ public class SocketPlayer extends Player {
                 break;
             case RAISE:
                 do {
-                    amount = Float.parseFloat(sendMessageGetResponse("Type in how much you want to add to bet, min(" + String.valueOf(currentBet - currentBalanceInPool) + "): "));
+                    amount = Float.parseFloat(sendMessageGetResponse("Type in how much you want to add to bet, min(" + (currentBet - currentBalanceInPool) + "): "));
                 } while (amount <= currentBet - currentBalanceInPool);
                 break;
             default:

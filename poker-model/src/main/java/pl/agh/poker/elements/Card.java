@@ -7,10 +7,10 @@ public class Card {
     private int rank;
     private int suite;
 
-    private final Map<Integer, String> rankToString = new HashMap<Integer, String>();
+    private final Map<Integer, String> rankToString = new HashMap<>();
 
 
-    private final Map<Integer, String> suiteToString = new HashMap<Integer, String>();
+    private final Map<Integer, String> suiteToString = new HashMap<>();
 
 
     public Card(int rank, int suite) {

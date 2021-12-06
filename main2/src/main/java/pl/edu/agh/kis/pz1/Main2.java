@@ -1,6 +1,10 @@
 package pl.edu.agh.kis.pz1;
 
 
+import pl.agh.poker.exceptions.NotEnoughCardsInDeckException;
+import pl.agh.poker.exceptions.TooMuchCardsTooDiscard;
+import pl.agh.poker.exceptions.WrongCardsIndicesException;
+import pl.agh.poker.exceptions.WrongNumberOfPlayers;
 import pl.agh.poker.game.Table;
 
 
@@ -13,7 +17,7 @@ import java.util.*;
  * @author Paweł Skrzyński
  */
 public class Main2 {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, WrongCardsIndicesException, WrongNumberOfPlayers, NotEnoughCardsInDeckException, TooMuchCardsTooDiscard {
         Scanner myInput = new Scanner(System.in);
         while (true) {
             System.out.println("Type in number of players: ");

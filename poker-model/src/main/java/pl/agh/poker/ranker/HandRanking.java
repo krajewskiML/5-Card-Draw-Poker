@@ -101,11 +101,13 @@ public class HandRanking {
 
     private List<Integer> checkPair(List<Card> cards) {
         List<Integer> ranks = getRanksOfCards(cards);
-        for (int idx = 0; idx < Constants.CARDS_IN_HAND; ++idx) {
+        int pair;
+        for (int idx = 0; idx < ranks.size(); ++idx) {
             if (Collections.frequency(ranks, ranks.get(idx)) == 2) {
-                ranks.remove(ranks.get(idx));
-                ranks.remove(ranks.get(idx));
-                return Arrays.asList(ranks.get(idx), ranks.get(0), ranks.get(1), ranks.get(2));
+                pair = ranks.get(idx);
+                ranks.remove(Integer.valueOf(pair));
+                ranks.remove(Integer.valueOf(pair));
+                return Arrays.asList(pair, ranks.get(0), ranks.get(1), ranks.get(2));
             }
         }
         return Collections.emptyList();
@@ -113,31 +115,40 @@ public class HandRanking {
 
     private List<Integer> checkTwoPairs(List<Card> cards) {
         List<Integer> ranks = getRanksOfCards(cards);
-        int pairValFirst = -1, pairValSecond = -1;
-        for (int idx = 0; idx < ranks.size(); ++idx) {
-            if (Collections.frequency(ranks, ranks.get(idx)) == 2) {
-                if (pairValFirst == -1) {
-                    pairValFirst = ranks.get(idx);
-                    ranks.remove(Integer.valueOf(pairValFirst));
-                    ranks.remove(Integer.valueOf(pairValFirst));
-                } else {
-                    pairValSecond = ranks.get(idx);
-                    ranks.remove(Integer.valueOf(pairValSecond));
-                    ranks.remove(Integer.valueOf(pairValSecond));
-                    break;
-                }
-                idx = -1;
-            }
-        }
-        if (pairValSecond != -1 && pairValFirst != -1) {
-            return Arrays.asList(
-                    Math.max(pairValSecond, pairValFirst),
-                    Math.min(pairValSecond, pairValFirst),
-                    ranks.get(0)
-            );
-        } else {
+        int pairValFirst;
+        int pairValSecond;
+        List<Integer> pair = checkPair(cards);
+        if (pair.isEmpty()) {
             return Collections.emptyList();
         }
+        pairValFirst = pair.get(0);
+        ranks.remove(pair.get(0));
+        ranks.remove(pair.get(0));
+        if (Objects.equals(ranks.get(0), ranks.get(1))) {
+            pairValSecond = ranks.get(0);
+            if (pairValFirst < pairValSecond) {
+                return Arrays.asList(pairValSecond, pairValFirst, ranks.get(2));
+            } else {
+                return Arrays.asList(pairValFirst, pairValSecond, ranks.get(2));
+            }
+        }
+        if (Objects.equals(ranks.get(0), ranks.get(2))) {
+            pairValSecond = ranks.get(0);
+            if (pairValFirst < pairValSecond) {
+                return Arrays.asList(pairValSecond, pairValFirst, ranks.get(1));
+            } else {
+                return Arrays.asList(pairValFirst, pairValSecond, ranks.get(1));
+            }
+        }
+        if (Objects.equals(ranks.get(1), ranks.get(2))) {
+            pairValSecond = ranks.get(1);
+            if (pairValFirst < pairValSecond) {
+                return Arrays.asList(pairValSecond, pairValFirst, ranks.get(0));
+            } else {
+                return Arrays.asList(pairValFirst, pairValSecond, ranks.get(0));
+            }
+        }
+        return Collections.emptyList();
     }
 
     private List<Integer> check3OfKind(List<Card> cards) {
@@ -237,4 +248,27 @@ public class HandRanking {
         return Collections.emptyList();
     }
 
+    public String toString() {
+        switch (getStrengthOfHand()){
+            case 0:
+                return "Strong Card";
+            case 1:
+                return "Pair";
+            case 2:
+                return "Two Pairs";
+            case 3:
+                return "Triple";
+            case 4:
+                return "Straight";
+            case 5:
+                return "Flush";
+            case 6:
+                return "Full House";
+            case 7:
+                return "Four of a kind";
+            case 8:
+                return "Straight Flush";
+        };
+        return "";
+    }
 }

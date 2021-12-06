@@ -1,6 +1,8 @@
 package pl.agh.poker.elements;
 
 
+import pl.agh.poker.exceptions.NotEnoughCardsInDeckException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -20,21 +22,27 @@ public class Deck {
         }
     }
 
-    public void shuffle() {
-        Collections.shuffle(this.cards);
-    }
-
-    public List<Card> dealCards(int numOfCards) {
-        if (this.cards.size() >= numOfCards) {
+    public List<Card> dealCards(int numOfCards) throws NotEnoughCardsInDeckException {
+        if (cards.size() >= numOfCards) {
             List<Card> result = new ArrayList<>();
+            List<Integer> alreadyPicked = new ArrayList<>();
             int idxOfPickedCard;
             for (int idx = 0; idx < numOfCards; ++idx) {
+
                 idxOfPickedCard = random.ints(0, cards.size()).findFirst().getAsInt();
-                result.add(cards.remove(idxOfPickedCard));
+                while (alreadyPicked.contains(idxOfPickedCard)){
+                    idxOfPickedCard = random.ints(0, cards.size()).findFirst().getAsInt();
+                }
+                alreadyPicked.add(idxOfPickedCard);
+                result.add(cards.get(idxOfPickedCard));
+            }
+            Collections.sort(alreadyPicked);
+            Collections.reverse(alreadyPicked);
+            for(int idx: alreadyPicked){
+                cards.remove(idx);
             }
             return result;
         }
-        // raise exception
-        return null;
+        throw new NotEnoughCardsInDeckException();
     }
 }

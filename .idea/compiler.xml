@@ -9,10 +9,12 @@
         <module name="main" />
         <module name="main2" />
         <module name="main1" />
-        <module name="utils" />
-        <module name="poker-model" />
         <module name="poker-common" />
+        <module name="poker-model" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="utils" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

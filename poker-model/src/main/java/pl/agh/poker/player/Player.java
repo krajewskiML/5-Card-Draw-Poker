@@ -1,6 +1,7 @@
 package pl.agh.poker.player;
 
 import pl.agh.poker.elements.Card;
+import pl.agh.poker.exceptions.TooMuchCardsTooDiscard;
 import pl.agh.poker.ranker.HandRanking;
 
 import pl.agh.poker.constants.Constants;
@@ -22,6 +23,8 @@ public class Player {
         cards = new ArrayList<>();
         setBalance(Constants.STARTING_BALANCE);
         setInGame(true);
+        setAllIn(false);
+        setFolded(false);
     }
 
     public HandRanking getHandRanking() {
@@ -110,18 +113,15 @@ public class Player {
         }
     }
 
-    public List<Card> returnCards(List<Integer> indicesOfCardsToReturn) {
-        if (indicesOfCardsToReturn.size() > Constants.CARDS_IN_HAND - 1) {
-            //throws exception
-            return null;
+    public void returnCards(List<Integer> indicesOfCardsToReturn) throws TooMuchCardsTooDiscard {
+        if (indicesOfCardsToReturn.size() > Constants.CARDS_IN_HAND) {
+            throw new TooMuchCardsTooDiscard(indicesOfCardsToReturn.size());
         } else {
             Collections.sort(indicesOfCardsToReturn);
             Collections.reverse(indicesOfCardsToReturn);
-            List<Card> result = new ArrayList<>();
             for (int toRemove : indicesOfCardsToReturn) {
-                result.add(cards.remove(toRemove));
+                cards.remove(toRemove);
             }
-            return result;
         }
     }
 
@@ -136,9 +136,9 @@ public class Player {
     }
 
 
-    public List<Card> returnAllCards() {
+    public void returnAllCards() throws TooMuchCardsTooDiscard {
         List<Integer> indices = Arrays.asList(0, 1, 2, 3, 4);
-        return returnCards(indices);
+        returnCards(indices);
     }
 
     public void fold() {

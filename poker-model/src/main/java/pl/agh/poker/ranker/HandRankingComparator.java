@@ -8,13 +8,13 @@ public class HandRankingComparator implements Comparator<HandRanking> {
     @Override
     public int compare(HandRanking firstHand, HandRanking secondHand) {
         if (firstHand.getStrengthOfHand() != secondHand.getStrengthOfHand()) {
-            return Integer.compare(firstHand.getStrengthOfHand(), secondHand.getStrengthOfHand());
+            return -Integer.compare(firstHand.getStrengthOfHand(), secondHand.getStrengthOfHand());
         } else {
             List<Integer> firstHandSignificantValues = firstHand.getSignificantValues();
             List<Integer> secondHandSignificantValues = secondHand.getSignificantValues();
             for (int idx = 0; idx < firstHandSignificantValues.size(); ++idx) {
                 if (!Objects.equals(firstHandSignificantValues.get(idx), secondHandSignificantValues.get(idx))) {
-                    return Integer.compare(
+                    return -Integer.compare(
                             firstHandSignificantValues.get(idx),
                             secondHandSignificantValues.get(idx)
                     );
