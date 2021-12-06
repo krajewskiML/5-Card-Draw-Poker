@@ -30,7 +30,7 @@ public class HandRankingComparatorTest extends TestCase {
 
         int result = comparator.compare(pairRanking, tripleRanking);
 
-        assertTrue(result < 0);
+        assertTrue(result > 0);
     }
     public void testPairVSPair(){
         List<Card> cards = new ArrayList<>();
@@ -55,7 +55,7 @@ public class HandRankingComparatorTest extends TestCase {
 
         int result = comparator.compare(pairRanking, pairRanking2);
 
-        assertTrue(result < 0);
+        assertTrue(result > 0);
     }
 
 }

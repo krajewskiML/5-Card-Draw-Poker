@@ -35,7 +35,7 @@ public class PlayerComparatorTest extends TestCase {
 
         int result = comparator.compare(player1, player2);
 
-        assertTrue(result < 0);
+        assertTrue(result > 0);
     }
     public void testPairVSPairPlayer(){
         List<Card> cards = new ArrayList<>();
@@ -64,6 +64,6 @@ public class PlayerComparatorTest extends TestCase {
 
         int result = comparator.compare(player1, player2);
 
-        assertTrue(result < 0);
+        assertTrue(result > 0);
     }
 }

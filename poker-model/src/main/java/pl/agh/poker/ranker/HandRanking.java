@@ -268,7 +268,8 @@ public class HandRanking {
                 return "Four of a kind";
             case 8:
                 return "Straight Flush";
-        };
-        return "";
+            default:
+                return "";
+        }
     }
 }

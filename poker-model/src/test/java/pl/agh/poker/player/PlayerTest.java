@@ -24,7 +24,7 @@ public class PlayerTest extends TestCase {
         Player player = new Player();
         float amount = player.bet(20);
         assertEquals(20, amount);
-        assertEquals(Constants.STARTING_BALANCE - 20, player.getBalance());
+        assertEquals((int)(Constants.STARTING_BALANCE - 20), (int)player.getBalance());
     }
 
     public void testFetchCards() throws NotEnoughCardsInDeckException {

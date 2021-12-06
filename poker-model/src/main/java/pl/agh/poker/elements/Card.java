@@ -3,6 +3,9 @@ package pl.agh.poker.elements;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class representing single card
+ */
 public class Card {
     private int rank;
     private int suite;
@@ -12,7 +15,11 @@ public class Card {
 
     private final Map<Integer, String> suiteToString = new HashMap<>();
 
-
+    /**
+     * Card constructor
+     * @param rank number from 0-12 indicating strength of card
+     * @param suite number from 0-3 indicating color of card
+     */
     public Card(int rank, int suite) {
         //initializes rank and suite values
         this.setRank(rank);
@@ -37,25 +44,44 @@ public class Card {
         suiteToString.put(3, "Pikes");
     }
 
-
+    /**
+     * Sets rank of card
+     * @param rnk takes number from 0-12 and assigns is it as rank
+     */
     public void setRank(int rnk) {
         if (rnk >= 0 && rnk <= 12)
             this.rank = rnk;
     }
 
+    /**
+     * Gets rank of card
+     * @return rank from 0-12
+     */
     public int getRank() {
         return rank;
     }
 
+    /**
+     * Sets suite
+     * @param suite takes number from 0-3 and assigns it as suite
+     */
     public void setSuite(int suite) {
         if (suite >= 0 && suite <= 3)
             this.suite = suite;
     }
 
+    /**
+     * Returns suite
+     * @return suite from 0-3
+     */
     public int getSuite() {
         return suite;
     }
 
+    /**
+     * String representation of card
+     * @return String representation of card
+     */
     public String toString() {
         return rankToString.get(this.rank) + " " + suiteToString.get(this.suite);
     }
